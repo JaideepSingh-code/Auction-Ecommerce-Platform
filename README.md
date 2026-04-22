@@ -1,6 +1,6 @@
 # Auction E-commerce Platform
 
-A full-stack online auction bidding system supporting forward auctions where users list items for sale and buyers compete by placing incrementally higher bids.
+A full-stack auction system where sellers list items and buyers compete through real-time bidding. Built with FastAPI, React, TypeScript, and PostgreSQL, fully containerized with Docker Compose.
 
 ## Demo
 
@@ -9,68 +9,171 @@ A full-stack online auction bidding system supporting forward auctions where use
 ## Tech Stack
 
 - **Backend:** Python / FastAPI
-- **Frontend:** React / Next.js / TypeScript / Tailwind CSS
+- **Frontend:** React, TypeScript, TailwindCSS
 - **Database:** PostgreSQL
-- **Auth:** JWT (JSON Web Tokens)
+- **Migrations:** Alembic
+- **API Docs:** OpenAPI / Swagger (auto-generated)
+- **Auth:** JWT tokens, bcrypt password hashing
 - **Deployment:** Docker / Docker Compose
 
-## Features
+## Setup Instructions
 
-- **User Authentication** — Secure registration and login with JWT tokens and bcrypt password hashing
-- **Item Listings** — Create, browse, and search auction listings with images, descriptions, and categories
-- **Forward Auctions** — Place incrementally higher bids within a time-bound auction window
-- **Real-time Updates** — Live bid tracking and auction countdown timers
-- **Card Validation** — Luhn algorithm-based credit card validation for payment processing
-- **User Profiles** — View bid history, active listings, and won auctions
-- **Search & Filter** — Filter auctions by category, price range, and status
-- **Responsive UI** — Clean, modern interface built with Tailwind CSS
+**Step 1: Clone the repository**
 
-## Getting Started
+```bash
+git clone https://github.com/JaideepSingh-code/Auction-Ecommerce-Platform.git
+cd Auction-Ecommerce-Platform
+```
 
-### Prerequisites
+**Prerequisites:**
+- Install Docker: `brew install docker`
+- Download [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
-- Python 3.11+
-- Node.js 18+
-- PostgreSQL 15+
-- Docker (optional)
+**Step 2: Start all containers** (takes ~30–60 seconds to build)
 
-### Quick Start with Docker
+The Dockerfiles install all dependencies, run migrations to populate the database (including seeding categories), and start both backend and frontend services.
 
 ```bash
 docker-compose up --build
 ```
 
-Frontend: `http://localhost:3000` | API: `http://localhost:8000` | Docs: `http://localhost:8000/docs`
+This will start:
+- **Backend** at: http://127.0.0.1:8000
+- **Frontend** at: http://localhost:3000
+- **PostgreSQL** at: http://localhost:5434
 
-### Manual Setup
+```
+POSTGRES_DB: auction_db
+POSTGRES_USER: auction_user
+POSTGRES_PASSWORD: auction_password
+PORT: 5434
 
-#### Backend
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+DATABASE_URL = "postgresql://auction_user:auction_password@localhost:5434/auction_db"
 ```
 
-#### Frontend
+**Step 3: Verify containers are running**
+
 ```bash
-cd frontend
-npm install
-npm run dev
+docker ps
 ```
 
-## API Documentation
+Expected output:
+```
+CONTAINER ID   IMAGE                                    STATUS   PORTS
+f381795e7b9f   auction-ecommerce-platform-backend       Up       0.0.0.0:8000->8000/tcp
+abc123def456   auction-ecommerce-platform-frontend      Up       0.0.0.0:3000->3000/tcp
+abe4291b927d   postgres:15                              Up       0.0.0.0:5434->5432/tcp
+```
 
-FastAPI auto-generates interactive docs at `/docs` (Swagger UI) and `/redoc`.
+## API Endpoints
 
-See [docs/api-reference.md](docs/api-reference.md) for the full API reference.
+Interactive API documentation is auto-generated at: http://localhost:8000/docs#
 
-## Architecture
+## Postman Testing
 
-See [docs/architecture.md](docs/architecture.md) for system design details.
+A detailed Postman collection simulates real buyer–seller interactions across the full bidding lifecycle.
 
-## Team (Baby Blue)
+The collection is organized into folders (`/auth`, `/users`, `/catalogue`, `/auction`, `/orders`, `/delete_endpoints`), following the logical user flow. Each request uses collection variables — like `accessToken`, `addressId`, `categoryId`, and `itemId` — that are automatically set by post-request scripts. For instance, when a user logs in through `/auth/login`, the script extracts the `access_token` and saves it as a variable, letting all protected requests run seamlessly without manual setup.
+
+**Testing flow (run top to bottom):**
+
+1. Create the buyer and seller accounts, stay logged in as the seller
+2. Log in as the buyer to create an address or browse auction items
+3. Log in as the seller to create categories or list new items for auction
+4. Switch back to the buyer to place bids, check bidding status, and complete an order (pay for an order)
+
+This approach simulates both sides of the marketplace in a consistent, automated way — verifying that authentication, endpoint flows, and state transitions all work correctly end to end.
+
+## Database Schema
+
+### Core Tables
+
+1. **Users and Authentication**
+   - `users` — User accounts with authentication
+   - `addresses` — User shipping addresses
+   - `auth_sessions` — Active user sessions
+   - `password_reset_tokens` — Password reset functionality
+
+2. **Catalogue Management**
+   - `categories` — Product categories (hierarchical)
+   - `catalogue_items` — Products/items for sale
+   - `item_images` — Product images
+
+3. **Auction System**
+   - `auctions` — Auction listings
+   - `bids` — User bids on auctions
+
+4. **Order Management**
+   - `orders` — Purchase orders
+   - `payments` — Payment processing
+   - `receipts` — Order receipts
+   - `shipments` — Shipping information
+
+### Database Commands
+
+Use the `db_commands.py` script for database operations:
+
+```bash
+# Initialize database (create all tables)
+python db_commands.py init-db
+
+# Create a new migration
+python db_commands.py create "Add new feature"
+
+# Run migrations
+python db_commands.py migrate
+
+# Show migration history
+python db_commands.py history
+
+# Show current revision
+python db_commands.py current
+
+# Downgrade by one revision
+python db_commands.py downgrade
+```
+
+### Manual Alembic Commands
+
+```bash
+# Create migration
+alembic revision --autogenerate -m "Description"
+
+# Run migrations
+alembic upgrade head
+
+# Show history
+alembic history
+
+# Show current revision
+alembic current
+```
+
+## Model Structure
+
+All SQLAlchemy models are organized in the `app/models/` directory:
+
+- `user.py` — User-related models
+- `catalogue.py` — Product catalogue models
+- `auction.py` — Auction system models
+- `order.py` — Order management models
+- `event_log.py` — Event logging model
+
+## Security Features
+
+- Password hashing with bcrypt
+- JWT-based authentication with session management
+- Password reset tokens with expiration
+- Input validation and constraints
+
+## Development Notes
+
+- The system uses psycopg3 (psycopg) as the PostgreSQL adapter
+- All migrations are auto-generated from model changes
+- The database URL is automatically converted to use the psycopg driver
+- Models are imported in `app/models/__init__.py` to ensure they're registered with SQLAlchemy
+
+## Team
 
 - Kanwarjot Singh Bharaj
 - Prabhjyot Grewal
