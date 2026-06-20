@@ -69,6 +69,13 @@ abe4291b927d   postgres:15                              Up       0.0.0.0:5434->5
 
 Interactive API documentation is auto-generated at: http://localhost:8000/docs#
 
+<img width="1497" height="1048" alt="Swagger API - Authentication and Users" src="https://github.com/user-attachments/assets/6979c56f-c650-4047-a460-53128341ed59" />
+
+<img width="1470" height="1205" alt="Swagger API - Catalogue and Auctions" src="https://github.com/user-attachments/assets/ed85c4a9-b3bb-4354-b05e-6a1d0f9cf190" />
+
+<img width="1470" height="1095" alt="Swagger API - Orders and Payments" src="https://github.com/user-attachments/assets/44023daf-e107-42fc-81e0-f56dceefb8c2" />
+
+
 ## Postman Testing
 
 A detailed Postman collection simulates real buyer–seller interactions across the full bidding lifecycle.
