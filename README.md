@@ -171,6 +171,77 @@ All SQLAlchemy models are organized in the `app/models/` directory:
 - Password reset tokens with expiration
 - Input validation and constraints
 
+## Project Structure
+
+```
+Auction-Ecommerce-Platform/
+├── backend/
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── config.py                   # Environment configuration
+│   │   ├── database.py                 # SQLAlchemy engine & session
+│   │   ├── main.py                     # FastAPI application entry point
+│   │   ├── models/
+│   │   │   ├── __init__.py
+│   │   │   ├── user.py                 # User & auth models
+│   │   │   ├── auction.py              # Auction & bid models
+│   │   │   ├── bid.py                  # Bid model
+│   │   │   └── item.py                 # Catalogue item model
+│   │   ├── routes/
+│   │   │   ├── __init__.py
+│   │   │   ├── auth.py                 # Login, register, password reset
+│   │   │   ├── auctions.py             # Auction CRUD & lifecycle
+│   │   │   ├── bids.py                 # Bid placement & history
+│   │   │   ├── items.py                # Item listing & search
+│   │   │   └── users.py                # User profile & addresses
+│   │   ├── schemas/
+│   │   │   ├── __init__.py
+│   │   │   └── schemas.py              # Pydantic request/response models
+│   │   └── utils/
+│   │       ├── __init__.py
+│   │       ├── auth.py                 # JWT & bcrypt utilities
+│   │       └── validators.py           # Input validation helpers
+│   └── tests/
+│       ├── __init__.py
+│       ├── test_auth.py                # Authentication tests
+│       ├── test_bids.py                # Bid logic tests
+│       └── test_validators.py          # Validation tests
+├── frontend/
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── next.config.js
+│   ├── tailwind.config.js
+│   ├── tsconfig.json
+│   ├── postcss.config.js
+│   └── src/
+│       ├── app/
+│       │   ├── layout.tsx              # Root layout
+│       │   ├── page.tsx                # Home page
+│       │   ├── globals.css
+│       │   ├── login/page.tsx          # Login page
+│       │   ├── dashboard/page.tsx      # User dashboard
+│       │   ├── auctions/
+│       │   │   ├── page.tsx            # Auction listings
+│       │   │   └── [id]/page.tsx       # Auction detail + bidding
+│       │   ├── create-listing/page.tsx # Create new auction
+│       │   └── profile/page.tsx        # User profile
+│       ├── components/
+│       │   ├── AuctionCard.tsx         # Auction card component
+│       │   ├── BidHistory.tsx          # Bid history display
+│       │   └── Navbar.tsx              # Navigation bar
+│       └── lib/
+│           ├── api.ts                  # API client
+│           └── auth.ts                 # Auth utilities
+├── docs/
+│   ├── api-reference.md               # API documentation
+│   └── architecture.md                # System architecture
+├── docker-compose.yml                  # Multi-container orchestration
+├── LICENSE
+└── README.md
+```
+
 ## Development Notes
 
 - The system uses psycopg3 (psycopg) as the PostgreSQL adapter
